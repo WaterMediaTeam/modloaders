@@ -14,18 +14,12 @@ java {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-sourcesJar {
-    exclude("videolan/**.zip")
-    exclude("videolan/**.7z")
-}
-
 println("Gradle Java: ${JavaVersion.current()}")
 println("Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}, Encoding: ${System.getProperty "file.encoding"}")
 
 repositories {
     google()
     mavenCentral()
-    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
