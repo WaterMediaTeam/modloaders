@@ -1,19 +1,65 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'maven-publish'
 }
 
 base {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    archivesName = id
+    libsDirectory = new File("buildjars/");
 }
 
+java {
+    withSourcesJar()
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+sourcesJar {
+    exclude("videolan/**.zip")
+    exclude("videolan/**.7z")
+}
+
+println("Gradle Java: ${JavaVersion.current()}")
+println("Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}, Encoding: ${System.getProperty "file.encoding"}")
+
 repositories {
+    google()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    compileOnly 'org.apache.logging.log4j:log4j-api:2.15.0'
-    compileOnly 'org.apache.logging.log4j:log4j-core:2.17.1'
-    compileOnly 'org.apache.commons:commons-lang3:3.12.0'
+    compileOnly "org.apache.logging.log4j:log4j-api:$log4j_version"
+    compileOnly "org.apache.logging.log4j:log4j-core:$log4jcore_version"
+    compileOnly "org.apache.commons:commons-lang3:$commonslang3_version"
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+
+    manifest {
+        attributes "Specification-Title": id
+        attributes "Specification-Vendor": authors
+        attributes "Specification-Version": version
+        attributes "Implementation-Title": brandname
+        attributes "Implementation-Version": version
+        attributes "Implementation-Vendor": authors
+        attributes "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+    }
+}
+
+publishing {
+    tasks.publish {
+        dependsOn(tasks.build)
+    }
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "file://${project.projectDir}/publications"
+        }
+    }
 }
